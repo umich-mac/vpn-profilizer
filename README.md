@@ -4,9 +4,9 @@ Do you find yourself needing to create dozens of Cisco ~~AnyConnect~~ Secure Cli
 
 ## How To Use This
 
-0. Download an appropriate release from the [releases page](releases/latest).
+0. Download an appropriate release from the [releases page](https://github.com/umich-mac/vpn-profilizer/releases/latest).
 1. A valid `pkcs12` file for signing your profile. Presumably you don't want Jamf to mess with it, which is it gets signed.
-2. A CSV file with four columns:
+2. A CSV file with four columns in this order. The header row is **required**, but the column names are not important.
    * Display Name (what your users will see, and what the resulting file will be named)
    * Remote address of the VPN server, e.g., `vpn.northwinds.contoso.com`
    * The Group Name, e.g., `funnelize-tunnelize-all-traffic`
