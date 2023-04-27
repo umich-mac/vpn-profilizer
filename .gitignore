@@ -1,0 +1,8 @@
+*.p12
+vpns.csv
+
+*.configprofile
+!template.configprofile
+
+
+dist/

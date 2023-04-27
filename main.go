@@ -1,0 +1,89 @@
+package main
+
+import (
+	"encoding/csv"
+	"flag"
+	"io"
+	"log"
+	"os"
+
+	"golang.org/x/crypto/pkcs12"
+)
+
+func main() {
+	templatePath := flag.String("template", "template.configprofile", "path to the template to use")
+	csvPath := flag.String("csv", "vpns.csv", "path to the CSV of VPN configs")
+	p12Path := flag.String("certificate", "engineering.p12", "path to certificate (in PKCS12 format)")
+	p12Password := flag.String("password", "", "password for PKCS12 certificate")
+	flag.Parse()
+
+	tmpl := LoadTemplate(*templatePath)
+
+	p12File, err := os.Open(*p12Path)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer p12File.Close()
+
+	p12Bytes, err := io.ReadAll(p12File)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	privateKey, certificate, err := pkcs12.Decode(p12Bytes, *p12Password)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	csvfile, err := os.Open(*csvPath)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer csvfile.Close()
+
+	reader := csv.NewReader(csvfile)
+
+	// TODO MAYBE make this tolerate columns in different orderd
+	// discard the header line
+	_, err = reader.Read()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// process csv
+	for {
+		data, err := reader.Read()
+		if err != nil {
+			if err == io.EOF {
+				break
+			}
+			log.Fatal(err)
+		}
+
+		profile, err := GenerateProfile(tmpl, data[0], data[2], data[1], data[3])
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		signedProfile, err := Sign(privateKey, certificate, profile)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		outPath := data[0] + ".configprofile"
+		outFile, err := os.Create(outPath)
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer outFile.Close()
+
+		// write it
+		outFile.Write(signedProfile)
+		log.Printf("created %s", outPath)
+	}
+
+}
