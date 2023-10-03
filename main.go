@@ -3,11 +3,13 @@ package main
 import (
 	"encoding/csv"
 	"flag"
+	"fmt"
 	"io"
 	"log"
 	"os"
 
 	"golang.org/x/crypto/pkcs12"
+	"golang.org/x/crypto/ssh/terminal"
 )
 
 func main() {
@@ -16,6 +18,17 @@ func main() {
 	p12Path := flag.String("certificate", "engineering.p12", "path to certificate (in PKCS12 format)")
 	p12Password := flag.String("password", "", "password for PKCS12 certificate")
 	flag.Parse()
+
+	if *p12Password == "" {
+		fmt.Print("Please enter the PKCS12 password: ")
+		bytePassword, err := terminal.ReadPassword(int(os.Stdin.Fd()))
+		if err != nil {
+			fmt.Println("Error reading password:", err)
+			os.Exit(1)
+		}
+		*p12Password = string(bytePassword)
+		fmt.Println() // Print a newline after password input
+	}
 
 	tmpl := LoadTemplate(*templatePath)
 
@@ -74,7 +87,6 @@ func main() {
 			log.Fatal(err)
 		}
 
-		outPath := data[0] + ".configprofile"
 		outPath := data[0] + ".mobileconfig"
 		outFile, err := os.Create(outPath)
 		if err != nil {
