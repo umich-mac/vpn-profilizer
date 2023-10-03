@@ -75,6 +75,7 @@ func main() {
 		}
 
 		outPath := data[0] + ".configprofile"
+		outPath := data[0] + ".mobileconfig"
 		outFile, err := os.Create(outPath)
 		if err != nil {
 			log.Fatal(err)
