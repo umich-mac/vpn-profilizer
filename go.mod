@@ -6,9 +6,9 @@ require go.mozilla.org/pkcs7 v0.0.0-20210826202110-33d05740a352
 
 require github.com/google/uuid v1.3.0
 
-require golang.org/x/crypto v0.8.0
+require golang.org/x/crypto v0.31.0
 
 require (
-	golang.org/x/sys v0.7.0 // indirect
-	golang.org/x/term v0.7.0 // indirect
+	golang.org/x/sys v0.28.0 // indirect
+	golang.org/x/term v0.27.0 // indirect
 )
